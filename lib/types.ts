@@ -421,6 +421,7 @@ export interface CategoryPhone extends Phone {
   category_score: number
   category_rank: number
   position: number
+  metric?: string | null
   breakdown?: Record<string, unknown> | null
 }
 
@@ -438,6 +439,7 @@ export interface CategoryDetail {
   alias_of: string | null
   buy: Record<string, BuyOfferInfo>
   top_weakness: string | null
+  updated_at?: string | null
 }
 
 export interface BestHubTile {
