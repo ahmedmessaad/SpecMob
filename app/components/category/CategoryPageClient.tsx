@@ -14,6 +14,7 @@ import AdSlot from '@/app/components/ads/AdSlot'
 import { useToast } from '@/app/components/Toast'
 import { categoryIcon, paletteFor, shortLabel } from '@/app/components/category/categoryVisuals'
 import { MAX_COMPARE, ROUTES } from '@/lib/config'
+import { categoryHeading } from '@/lib/categoryCopy'
 import { tierStyle } from '@/lib/tiers'
 import { formatUsd } from '@/lib/price'
 import { c, f, r, mq } from '@/lib/tokens'
@@ -114,12 +115,18 @@ function RankCard({
                 {tier.label}
               </span>
             )}
+            {phone.metric && (
+              <span style={{ fontSize: 11.5, fontWeight: 700, padding: '2px 9px', borderRadius: r.full, color: c.text1, background: c.bg, border: `1px solid ${c.border}` }}>
+                {phone.metric}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
       {phone.summary && (
         <p
+          data-nosnippet
           style={{
             fontSize: isBest ? 14.5 : 13.5, color: c.text2, lineHeight: 1.6, margin: '0 0 14px',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
@@ -211,7 +218,6 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
   const compareIds = comparePhones.map(p => p.id)
   const otherCats = categories.filter(cat => cat.slug !== data.slug)
 
-  // Price pages are non-overlapping bands, so point readers to the neighbouring bands.
   const budgetLinks = (() => {
     const cap = (slug: string) => parseInt(slug.replace('under-', ''), 10)
     if (!data.slug.startsWith('under-')) return []
@@ -236,7 +242,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
           <span aria-current="page">{data.title}</span>
         </nav>
 
-        <div className="category-tabs" style={{ marginTop: 20, overflowX: 'auto', scrollbarWidth: 'none', borderBottom: `1px solid ${c.border}` }}>
+        <div className="category-tabs" data-nosnippet style={{ marginTop: 20, overflowX: 'auto', scrollbarWidth: 'none', borderBottom: `1px solid ${c.border}` }}>
           <div style={{ display: 'flex', gap: 0, minWidth: 'max-content' }}>
             {categories.map(cat => {
               const active = cat.slug === data.slug
@@ -257,7 +263,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
 
         <div className="hero-section" style={{ padding: '32px 0 28px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 28, flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 280 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: pal.bg, borderRadius: 'var(--r-full)', fontSize: 11.5, fontWeight: 600, color: pal.iconColor, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 16 }}>
+            <div data-nosnippet style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: pal.bg, borderRadius: 'var(--r-full)', fontSize: 11.5, fontWeight: 600, color: pal.iconColor, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 16 }}>
               <TrendingUp size={12} />
               Category ranking
             </div>
@@ -266,12 +272,12 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
                 {categoryIcon(data.slug, 22)}
               </div>
               <h1 className="category-hero-title" style={{ fontFamily: f.serif, fontSize: 40, color: c.text1, letterSpacing: '-1px', lineHeight: 1.1, fontWeight: 400 }}>
-                {data.slug.startsWith('under-') ? `${data.title} (${year})` : `${data.title} ${year}`}
+                {categoryHeading(data, year)}
               </h1>
             </div>
             <p style={{ fontSize: 15, color: c.text2, lineHeight: 1.65, maxWidth: 620, marginBottom: 16 }}>
               {lede || data.description}{' '}
-              <a href="#methodology" style={{ color: c.primary, fontWeight: 600, whiteSpace: 'nowrap' }}>How we rank</a>
+              <a href="#methodology" data-nosnippet style={{ color: c.primary, fontWeight: 600, whiteSpace: 'nowrap' }}>How we rank</a>
             </p>
             {budgetLinks.length > 0 && (
               <p style={{ fontSize: 14, color: c.text2, lineHeight: 1.6, maxWidth: 620, marginBottom: 16 }}>
@@ -283,7 +289,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
                 ))}
               </p>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div data-nosnippet style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Clock size={13} />Updated {updatedLabel}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Smartphone size={13} /><strong style={{ color: c.text2, fontWeight: 600 }}>{data.ranked_count}</strong>&nbsp;phones ranked</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Star size={13} />Limited phones per brand</span>
@@ -331,7 +337,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             <BarChart3 size={17} color={c.text2} />
             <h2 style={{ fontFamily: f.serif, fontSize: 18, color: c.text1, fontWeight: 400, margin: 0 }}>How we rank {label.toLowerCase()}</h2>
           </div>
-          <p style={{ fontSize: 13.5, color: c.text2, lineHeight: 1.65, maxWidth: 680, marginBottom: 14 }}>{data.description}</p>
+          <p data-nosnippet style={{ fontSize: 13.5, color: c.text2, lineHeight: 1.65, maxWidth: 680, marginBottom: 14 }}>{data.description}</p>
           <div style={{ padding: '11px 14px', background: pal.bg, borderRadius: 'var(--r-sm)', fontSize: 12.5, color: c.text2, lineHeight: 1.55, display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 12 }}>
             <Info size={14} style={{ flexShrink: 0, color: pal.iconColor, marginTop: 1 }} />
             <span>Rankings use listed specifications, not hands-on testing, so real-world results can differ. No brand sponsors these rankings.</span>
@@ -342,7 +348,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
         </section>
 
         {data.next_steps.length > 0 && (
-          <section aria-label="Next steps" style={{ marginTop: 32 }}>
+          <section aria-label="Next steps" data-nosnippet style={{ marginTop: 32 }}>
             <h2 style={{ fontFamily: f.serif, fontSize: 20, color: c.text1, fontWeight: 400, marginBottom: 12 }}>Where to next</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
               {data.next_steps.map(step => (
@@ -362,7 +368,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
 
         <div style={{ marginTop: 40 }}><AdSlot placement="inline" /></div>
 
-        <section aria-label="More rankings" style={{ marginTop: 40 }}>
+        <section aria-label="More rankings" data-nosnippet style={{ marginTop: 40 }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: c.text3, marginBottom: 14 }}>More rankings</h2>
           <div className="other-cats-grid" style={{ display: 'grid', gap: 12 }}>
             {otherCats.map(cat => {
