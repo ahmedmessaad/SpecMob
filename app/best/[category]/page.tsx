@@ -68,7 +68,7 @@ export default async function CategoryPage({ params }: PageProps) {
         data={data}
         categories={list?.categories ?? []}
         year={year}
-        updatedLabel={updatedLabel((data as any).updated_at)}
+        updatedLabel={updatedLabel(data.updated_at)}
         lede={categoryLede(data)}
         tradeOff={data.top_weakness ?? null}
         buy={buy}
