@@ -15,7 +15,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/trade-in?phone=', '/search', '/api/'],
       },
     ],
-    sitemap: `${SITE_URL}/sitemap-main.xml`, `${SITE_URL}/sitemap-rest.xml`],
+    sitemap: [`${SITE_URL}/sitemap-main.xml`, `${SITE_URL}/sitemap-rest.xml`],
   }
 }
  
