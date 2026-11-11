@@ -89,8 +89,6 @@ const TOP_N = 10
 const firstFit = (candidates: string[], budget: number): string =>
   candidates.find(c => c.length <= budget) ?? candidates[candidates.length - 1]
 
-const shownCount = (data: CategoryDetail): number => Math.min(data.phones.length, TOP_N)
-
 const copyFor = (data: CategoryDetail): CategoryCopy =>
   COPY[data.slug] ?? { lead: data.title, topic: '', basis: 'our scoring', head: `${data.title} {y}` }
 
@@ -102,10 +100,9 @@ export function categoryHeading(data: CategoryDetail, year: number): string {
 }
 
 export function categoryTitle(data: CategoryDetail, year: number): string {
-  const n = shownCount(data)
-  const head = copyFor(data).head.replace('{y}', String(year)).replace('{n}', String(n))
-  if (n >= 3 && head.length <= TITLE_BUDGET) return head
-  return firstFit([`${data.title} (${year}): Top ${n} Ranked`, `${data.title} (${year})`], TITLE_BUDGET)
+  const head = copyFor(data).head.replace('{y}', String(year)).replace('{n}', String(TOP_N))
+  if (head.length <= TITLE_BUDGET) return head
+  return firstFit([`${data.title} (${year}): Top ${TOP_N} Ranked`, `${data.title} (${year})`], TITLE_BUDGET)
 }
 
 export function categoryLede(data: CategoryDetail): string {
@@ -119,12 +116,11 @@ export function categoryLede(data: CategoryDetail): string {
   const tail = third
     ? `, followed by ${labelled(second)} and ${labelled(third)}`
     : second ? `, followed by ${labelled(second)}` : ''
-  return `${head}${tail}. The top ${shownCount(data)} are ranked on ${basis}.${qualifier ? ` ${qualifier}` : ''}`
+  return `${head}${tail}. The top ${TOP_N} are ranked on ${basis}.${qualifier ? ` ${qualifier}` : ''}`
 }
 
 export function categoryDescription(data: CategoryDetail, year: number): string {
   const top = data.phones.slice(0, 3)
-  const n = shownCount(data)
   const { lead, basis, qualifier } = copyFor(data)
   if (!top.length) return `${data.title}: ranked on specifications, never on sponsors.`
 
@@ -139,8 +135,8 @@ export function categoryDescription(data: CategoryDetail, year: number): string 
       `${lead} ${year}: ${list(withMetric)}.${q} ${tail}`,
       `${lead} ${year}: ${list(withMetric)}.${q}`,
       `${lead} ${year}: ${list(plain)}. ${tail}`,
-      `${lead} ${year}: ${list(plain)}. See the top ${n} ranked.`,
-      `${lead} ${year}: ${plain[0]}. See the top ${n} ranked.`,
+      `${lead} ${year}: ${list(plain)}. See the top ${TOP_N} ranked.`,
+      `${lead} ${year}: ${plain[0]}. See the top ${TOP_N} ranked.`,
     ],
     DESCRIPTION_BUDGET,
   )
