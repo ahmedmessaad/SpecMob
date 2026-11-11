@@ -291,7 +291,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             )}
             <div data-nosnippet style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Clock size={13} />Updated {updatedLabel}</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Smartphone size={13} /><strong style={{ color: c.text2, fontWeight: 600 }}>{data.ranked_count}</strong>&nbsp;phones ranked</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Smartphone size={13} /><strong style={{ color: c.text2, fontWeight: 600 }}>Top 10</strong>&nbsp;ranked</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, color: c.text3 }}><Star size={13} />Limited phones per brand</span>
             </div>
           </div>
