@@ -1,132 +1,220 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { ChevronLeft, ChevronRight, Smartphone } from 'lucide-react'
 import { c } from '@/lib/tokens'
 import type { PhoneDetail } from '@/lib/types'
 
-// ─── gallery URL resolution ─────────────────────────────────────────────────
-
-export function buildGalleryUrls(phone: Pick<PhoneDetail, 'images' | 'main_image_url'>): string[] {
-  const extra = (phone.images ?? [])
-    .slice()
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map(img => img.url)
-    .filter(url => url !== phone.main_image_url)
-
-  const urls = phone.main_image_url ? [phone.main_image_url, ...extra] : extra
-  return urls.filter(Boolean)
-}
-
-// ─── image content normalization ────────────────────────────────────────────
-// Different sources ship product PNGs with wildly different amounts of
-// baked-in whitespace around the phone. This scans each image for the actual
-// non-transparent/non-white bounding box and returns a scale factor that
-// normalizes the subject to a consistent fraction of the frame.
+const GALLERY_MAIN_SIZE = 340
+const GALLERY_THUMB_SIZE = 56
+const MAIN_PX = GALLERY_MAIN_SIZE * 2
+const MAIN_PX_1X = GALLERY_MAIN_SIZE
+const THUMB_PX = GALLERY_THUMB_SIZE * 2
+const PRELOAD_DELAY_MS = 400
 
 const TARGET_FILL = 0.86
-const scaleCache: Record<string, number> = {}
+const SAMPLE_PX = 96
 
-function measureContentScale(url: string): Promise<number> {
-  if (scaleCache[url] !== undefined) return Promise.resolve(scaleCache[url])
+type GalleryPhone = Pick<PhoneDetail, 'images' | 'main_image_url' | 'display_name'>
 
-  return new Promise((resolve) => {
-    const img = new window.Image()
-    img.crossOrigin = 'anonymous'
+/**
+ * Gallery images only. The legacy main image is used as a fallback when the
+ * phone has no gallery images at all, so the page never renders empty.
+ */
+export function buildGalleryUrls(phone: Pick<PhoneDetail, 'images' | 'main_image_url'>): string[] {
+  const gallery = Array.from(
+    new Set(
+      (phone.images ?? [])
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map(img => img.url)
+        .filter((url): url is string => Boolean(url) && url !== phone.main_image_url),
+    ),
+  )
 
-    img.onload = () => {
-      try {
-        const w = img.naturalWidth
-        const h = img.naturalHeight
-        if (!w || !h) return resolve(1)
+  if (gallery.length > 0) return gallery
+  return phone.main_image_url ? [phone.main_image_url] : []
+}
 
-        const canvas = document.createElement('canvas')
-        canvas.width = w
-        canvas.height = h
-        const ctx = canvas.getContext('2d')
-        if (!ctx) return resolve(1)
+/** Supabase public Storage URL -> resized transformation URL. Other hosts pass through. */
+function resizeImageUrl(url: string, px: number): string {
+  try {
+    const parsed = new URL(url)
+    const isSupabaseStorage =
+      parsed.hostname.endsWith('.supabase.co') &&
+      parsed.pathname.includes('/storage/v1/object/public/')
 
-        ctx.drawImage(img, 0, 0)
-        const { data } = ctx.getImageData(0, 0, w, h)
+    if (!isSupabaseStorage) return url
 
-        let minX = w, minY = h, maxX = 0, maxY = 0
-        let found = false
-        const step = 2
+    parsed.pathname = parsed.pathname.replace(
+      '/storage/v1/object/public/',
+      '/storage/v1/render/image/public/',
+    )
+    parsed.searchParams.set('width', String(px))
+    parsed.searchParams.set('height', String(px))
+    parsed.searchParams.set('resize', 'contain')
+    parsed.searchParams.set('quality', '80')
+    return parsed.toString()
+  } catch {
+    return url
+  }
+}
 
-        for (let y = 0; y < h; y += step) {
-          for (let x = 0; x < w; x += step) {
-            const idx = (y * w + x) * 4
-            const alpha = data[idx + 3]
-            const r = data[idx], g = data[idx + 1], b = data[idx + 2]
-            const isBackground = alpha < 10 || (r > 245 && g > 245 && b > 245)
-            if (!isBackground) {
-              found = true
-              if (x < minX) minX = x
-              if (x > maxX) maxX = x
-              if (y < minY) minY = y
-              if (y > maxY) maxY = y
-            }
-          }
-        }
+/**
+ * Fraction-of-frame normalization. Measured from the already-loaded <img>
+ * on a downsampled canvas, so it costs no extra network request and almost
+ * no CPU. Returns 1 when the canvas is tainted or the image is unreadable.
+ */
+function measureContentScale(img: HTMLImageElement): number {
+  try {
+    const { naturalWidth: nw, naturalHeight: nh } = img
+    if (!nw || !nh) return 1
 
-        if (!found) { scaleCache[url] = 1; return resolve(1) }
+    const k = Math.min(1, SAMPLE_PX / Math.max(nw, nh))
+    const w = Math.max(1, Math.round(nw * k))
+    const h = Math.max(1, Math.round(nh * k))
 
-        const contentFrac = Math.max((maxX - minX) / w, (maxY - minY) / h)
-        const scale = contentFrac > 0
-          ? Math.min(Math.max(TARGET_FILL / contentFrac, 0.6), 1.8)
-          : 1
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return 1
 
-        scaleCache[url] = scale
-        resolve(scale)
-      } catch {
-        // canvas throws on CORS-tainted images — bail to no-op scale
-        scaleCache[url] = 1
-        resolve(1)
+    ctx.drawImage(img, 0, 0, w, h)
+    const { data } = ctx.getImageData(0, 0, w, h)
+
+    let minX = w, minY = h, maxX = -1, maxY = -1
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4
+        const isBackground =
+          data[i + 3] < 10 || (data[i] > 245 && data[i + 1] > 245 && data[i + 2] > 245)
+        if (isBackground) continue
+        if (x < minX) minX = x
+        if (x > maxX) maxX = x
+        if (y < minY) minY = y
+        if (y > maxY) maxY = y
       }
     }
 
-    img.onerror = () => { scaleCache[url] = 1; resolve(1) }
-    img.src = url
-  })
+    if (maxX < 0) return 1
+
+    const contentFrac = Math.max((maxX - minX + 1) / w, (maxY - minY + 1) / h)
+    return Math.min(Math.max(TARGET_FILL / contentFrac, 0.6), 1.8)
+  } catch {
+    return 1
+  }
 }
 
-function useContentScales(urls: string[]): Record<string, number> {
-  const [scales, setScales] = useState<Record<string, number>>({})
-  const key = urls.join('|')
+interface GalleryImageProps {
+  src: string
+  srcSet?: string
+  alt: string
+  eager?: boolean
+  highPriority?: boolean
+  style: CSSProperties
+  onScale: (scale: number) => void
+  onFail: () => void
+}
+
+/**
+ * Requests with CORS so the normalization can read pixels from the same
+ * response that is displayed (one fetch). If the host rejects CORS, it
+ * retries once without it and simply skips normalization.
+ */
+function GalleryImage({ src, srcSet, alt, eager, highPriority, style, onScale, onFail }: GalleryImageProps) {
+  const [cors, setCors] = useState(true)
+  const ref = useRef<HTMLImageElement>(null)
+
+  const handleLoad = (el: HTMLImageElement) => {
+    if (cors) onScale(measureContentScale(el))
+  }
+  const handleError = () => {
+    if (cors) setCors(false)
+    else onFail()
+  }
 
   useEffect(() => {
-    let cancelled = false
-    urls.forEach((url) => {
-      if (!url) return
-      measureContentScale(url).then((scale) => {
-        if (!cancelled) setScales((prev) => (prev[url] === scale ? prev : { ...prev, [url]: scale }))
-      })
-    })
-    return () => { cancelled = true }
+    const el = ref.current
+    if (!el || !el.complete) return
+    if (el.naturalWidth) handleLoad(el)
+    else handleError()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key])
+  }, [cors])
 
-  return scales
+  return (
+    <img
+      key={cors ? 'cors' : 'plain'}
+      ref={ref}
+      src={src}
+      srcSet={srcSet}
+      alt={alt}
+      crossOrigin={cors ? 'anonymous' : undefined}
+      loading={eager ? 'eager' : 'lazy'}
+      fetchPriority={highPriority ? 'high' : 'auto'}
+      decoding="async"
+      onLoad={e => handleLoad(e.currentTarget)}
+      onError={handleError}
+      style={style}
+    />
+  )
 }
 
-// ─── gallery component ───────────────────────────────────────────────────────
-// Mobile fix: the card is `minWidth: 0; width: 100%` so it can shrink inside
-// the grid track, the main image is capped by the box (never a fixed pixel
-// width), and the thumbnail strip scrolls inside itself instead of widening
-// the page.
+function preloadImage(url: string) {
+  const img = new window.Image()
+  img.crossOrigin = 'anonymous'
+  img.decoding = 'async'
+  img.src = url
+}
 
-const GALLERY_MAIN_SIZE = 340   // px, max size of the main image
-const GALLERY_THUMB_SIZE = 56   // px, thumbnail box
-
-export default function PhoneGallery({ phone }: { phone: Pick<PhoneDetail, 'images' | 'main_image_url' | 'display_name'> }) {
+export default function PhoneGallery({ phone }: { phone: GalleryPhone }) {
   const gallery = buildGalleryUrls(phone)
+  const count = gallery.length
   const [index, setIndex] = useState(0)
-  const [failed, setFailed] = useState<Record<number, boolean>>({})
-  const scales = useContentScales(gallery)
+  const [failed, setFailed] = useState<Record<string, boolean>>({})
+  const [scales, setScales] = useState<Record<string, number>>({})
 
-  const current = gallery[index]
-  const hasMultiple = gallery.length > 1
-  const goTo = (i: number) => setIndex((i + gallery.length) % gallery.length)
+  const safeIndex = count ? Math.min(index, count - 1) : 0
+  const current = gallery[safeIndex]
+  const hasMultiple = count > 1
+  const goTo = (i: number) => setIndex((i + count) % count)
+
+  const markFailed = (url: string) => setFailed(prev => (prev[url] ? prev : { ...prev, [url]: true }))
+  const setScale = (url: string, scale: number) =>
+    setScales(prev => (prev[url] === scale ? prev : { ...prev, [url]: scale }))
+
+  useEffect(() => {
+    if (count < 2) return
+    const targets = [gallery[safeIndex + 1], safeIndex > 0 ? gallery[safeIndex - 1] : undefined]
+      .filter((url): url is string => Boolean(url))
+      .map(url => resizeImageUrl(url, MAIN_PX))
+
+    const timer = window.setTimeout(() => targets.forEach(preloadImage), PRELOAD_DELAY_MS)
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safeIndex, count])
+
+  const mainSrc = current ? resizeImageUrl(current, MAIN_PX) : ''
+  const mainSrc1x = current ? resizeImageUrl(current, MAIN_PX_1X) : ''
+  const mainSrcSet = mainSrc !== current ? `${mainSrc1x} 1x, ${mainSrc} 2x` : undefined
+
+  const navButton: CSSProperties = {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: 32,
+    height: 32,
+    borderRadius: '50%',
+    background: c.surface,
+    border: `1px solid ${c.border}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: c.text2,
+    cursor: 'pointer',
+    boxShadow: 'var(--shadow-sm)',
+  }
 
   return (
     <div
@@ -156,13 +244,17 @@ export default function PhoneGallery({ phone }: { phone: Pick<PhoneDetail, 'imag
           justifyContent: 'center',
         }}
       >
-        {current && !failed[index]
-          ? <img
-              src={current}
+        {current && !failed[current]
+          ? (
+            <GalleryImage
+              key={current}
+              src={mainSrc}
+              srcSet={mainSrcSet}
               alt={phone.display_name}
-              fetchPriority="high"
-              loading="eager"
-              onError={() => setFailed(prev => ({ ...prev, [index]: true }))}
+              eager
+              highPriority={safeIndex === 0}
+              onScale={scale => setScale(current, scale)}
+              onFail={() => markFailed(current)}
               style={{
                 width: '100%',
                 height: '100%',
@@ -173,22 +265,15 @@ export default function PhoneGallery({ phone }: { phone: Pick<PhoneDetail, 'imag
                 transition: 'transform 0.15s ease',
               }}
             />
+          )
           : <Smartphone size={100} color={c.border} strokeWidth={0.8} />}
 
         {hasMultiple && (
           <>
-            <button
-              onClick={() => goTo(index - 1)}
-              aria-label="Previous image"
-              style={{ position: 'absolute', left: 4, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', background: c.surface, border: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.text2, cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
-            >
+            <button onClick={() => goTo(safeIndex - 1)} aria-label="Previous image" style={{ ...navButton, left: 4 }}>
               <ChevronLeft size={16} />
             </button>
-            <button
-              onClick={() => goTo(index + 1)}
-              aria-label="Next image"
-              style={{ position: 'absolute', right: 4, top: '50%', transform: 'translateY(-50%)', width: 32, height: 32, borderRadius: '50%', background: c.surface, border: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: c.text2, cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
-            >
+            <button onClick={() => goTo(safeIndex + 1)} aria-label="Next image" style={{ ...navButton, right: 4 }}>
               <ChevronRight size={16} />
             </button>
           </>
@@ -202,30 +287,41 @@ export default function PhoneGallery({ phone }: { phone: Pick<PhoneDetail, 'imag
         >
           {gallery.map((url, i) => (
             <button
-              key={`${url}-${i}`}
+              key={url}
               onClick={() => setIndex(i)}
               aria-label={`View image ${i + 1}`}
-              aria-current={i === index}
+              aria-current={i === safeIndex}
               style={{
-                flexShrink: 0, width: GALLERY_THUMB_SIZE, height: GALLERY_THUMB_SIZE, padding: 0,
+                flexShrink: 0,
+                width: GALLERY_THUMB_SIZE,
+                height: GALLERY_THUMB_SIZE,
+                padding: 0,
                 borderRadius: 'var(--r-sm)',
-                border: `2px solid ${i === index ? c.accent : c.border}`,
-                background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden', cursor: 'pointer', transition: 'border-color 0.15s',
+                border: `2px solid ${i === safeIndex ? c.accent : c.border}`,
+                background: c.bg,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'border-color 0.15s',
               }}
             >
-              {!failed[i]
-                ? <img
-                    src={url}
+              {!failed[url]
+                ? (
+                  <GalleryImage
+                    src={resizeImageUrl(url, THUMB_PX)}
                     alt=""
-                    loading="lazy"
-                    decoding="async"
-                    onError={() => setFailed(prev => ({ ...prev, [i]: true }))}
+                    onScale={scale => setScale(url, scale)}
+                    onFail={() => markFailed(url)}
                     style={{
-                      width: '80%', height: '80%', objectFit: 'contain',
+                      width: '80%',
+                      height: '80%',
+                      objectFit: 'contain',
                       transform: `scale(${scales[url] ?? 1})`,
                     }}
                   />
+                )
                 : <Smartphone size={20} color={c.border} strokeWidth={1} />}
             </button>
           ))}
@@ -239,5 +335,4 @@ export default function PhoneGallery({ phone }: { phone: Pick<PhoneDetail, 'imag
       `}</style>
     </div>
   )
-      
 }
