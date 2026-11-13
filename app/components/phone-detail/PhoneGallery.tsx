@@ -17,7 +17,7 @@ const SAMPLE_PX = 96
 
 type GalleryPhone = Pick<PhoneDetail, 'images' | 'main_image_url' | 'display_name'>
 
-/** Normalize a URL so the same file compares equal even with different query/hash/encoding. */
+/** Full normalized key: host + decoded path, no query/hash, render/object treated the same. */
 function normalizeUrl(url?: string | null): string {
   if (!url) return ''
   try {
@@ -28,42 +28,68 @@ function normalizeUrl(url?: string | null): string {
     } catch {
       /* keep raw path */
     }
-    // Treat render/object Supabase paths as the same file
     path = path.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
-    return `${u.hostname.toLowerCase()}${path}`.replace(/\/+$/, '')
+    return `${u.hostname.toLowerCase()}${path}`.replace(/\/+$/, '').toLowerCase()
   } catch {
-    return url.split('?')[0].split('#')[0].trim()
+    return url.split('?')[0].split('#')[0].trim().toLowerCase()
   }
 }
 
+/** Filename without extension, e.g. ".../abc-main.webp" -> "abc-main". Ignores folder and format. */
+function fileStem(url?: string | null): string {
+  const key = normalizeUrl(url)
+  if (!key) return ''
+  const name = key.split('/').pop() ?? ''
+  return name.replace(/\.[a-z0-9]{2,5}$/i, '')
+}
+
+function isFlaggedMain(img: unknown): boolean {
+  const r = img as Record<string, unknown>
+  if (r.is_main === true || r.is_primary === true || r.is_cover === true) return true
+  for (const k of ['type', 'kind', 'role', 'category']) {
+    const v = r[k]
+    if (typeof v === 'string' && ['main', 'primary', 'cover'].includes(v.toLowerCase())) return true
+  }
+  return false
+}
+
 /**
- * Gallery images only. The main image is excluded whenever the phone has at
- * least one real gallery image. It is used only as a fallback when there are
- * no gallery images at all, so the page never renders empty.
+ * Gallery images only. The main image (matched by flag, exact URL, or filename)
+ * is removed whenever real gallery images exist. It is used only as a fallback
+ * when the phone has no gallery images at all.
  */
 export function buildGalleryUrls(phone: Pick<PhoneDetail, 'images' | 'main_image_url'>): string[] {
   const mainKey = normalizeUrl(phone.main_image_url)
-
-  const gallery: string[] = []
-  const seen = new Set<string>()
+  const mainStem = fileStem(phone.main_image_url)
 
   const sorted = (phone.images ?? [])
     .slice()
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 
+  const gallery: string[] = []
+  const seen = new Set<string>()
+
   for (const img of sorted) {
     const url = img?.url
     if (!url) continue
-
-    // If your images table flags the main image, skip it too
-    const flags = img as unknown as Record<string, unknown>
-    if (flags.is_main === true || flags.is_primary === true || flags.is_cover === true) continue
+    if (isFlaggedMain(img)) continue
 
     const key = normalizeUrl(url)
-    if (!key || key === mainKey || seen.has(key)) continue
+    if (!key || seen.has(key)) continue
+    if (mainKey && key === mainKey) continue
+    if (mainStem && fileStem(url) === mainStem) continue
 
     seen.add(key)
     gallery.push(url)
+  }
+
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.log('[PhoneGallery]', {
+      main: phone.main_image_url,
+      images: sorted.map(i => i.url),
+      result: gallery,
+    })
   }
 
   if (gallery.length > 0) return gallery
