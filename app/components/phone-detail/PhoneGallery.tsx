@@ -17,20 +17,54 @@ const SAMPLE_PX = 96
 
 type GalleryPhone = Pick<PhoneDetail, 'images' | 'main_image_url' | 'display_name'>
 
+/** Normalize a URL so the same file compares equal even with different query/hash/encoding. */
+function normalizeUrl(url?: string | null): string {
+  if (!url) return ''
+  try {
+    const u = new URL(url)
+    let path = u.pathname
+    try {
+      path = decodeURIComponent(path)
+    } catch {
+      /* keep raw path */
+    }
+    // Treat render/object Supabase paths as the same file
+    path = path.replace('/storage/v1/render/image/public/', '/storage/v1/object/public/')
+    return `${u.hostname.toLowerCase()}${path}`.replace(/\/+$/, '')
+  } catch {
+    return url.split('?')[0].split('#')[0].trim()
+  }
+}
+
 /**
- * Gallery images only. The legacy main image is used as a fallback when the
- * phone has no gallery images at all, so the page never renders empty.
+ * Gallery images only. The main image is excluded whenever the phone has at
+ * least one real gallery image. It is used only as a fallback when there are
+ * no gallery images at all, so the page never renders empty.
  */
 export function buildGalleryUrls(phone: Pick<PhoneDetail, 'images' | 'main_image_url'>): string[] {
-  const gallery = Array.from(
-    new Set(
-      (phone.images ?? [])
-        .slice()
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .map(img => img.url)
-        .filter((url): url is string => Boolean(url) && url !== phone.main_image_url),
-    ),
-  )
+  const mainKey = normalizeUrl(phone.main_image_url)
+
+  const gallery: string[] = []
+  const seen = new Set<string>()
+
+  const sorted = (phone.images ?? [])
+    .slice()
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+
+  for (const img of sorted) {
+    const url = img?.url
+    if (!url) continue
+
+    // If your images table flags the main image, skip it too
+    const flags = img as unknown as Record<string, unknown>
+    if (flags.is_main === true || flags.is_primary === true || flags.is_cover === true) continue
+
+    const key = normalizeUrl(url)
+    if (!key || key === mainKey || seen.has(key)) continue
+
+    seen.add(key)
+    gallery.push(url)
+  }
 
   if (gallery.length > 0) return gallery
   return phone.main_image_url ? [phone.main_image_url] : []
@@ -171,9 +205,16 @@ function preloadImage(url: string) {
 export default function PhoneGallery({ phone }: { phone: GalleryPhone }) {
   const gallery = buildGalleryUrls(phone)
   const count = gallery.length
+  const galleryKey = gallery.join('|')
+
   const [index, setIndex] = useState(0)
   const [failed, setFailed] = useState<Record<string, boolean>>({})
   const [scales, setScales] = useState<Record<string, number>>({})
+
+  // Reset to the first gallery image whenever the phone / gallery changes
+  useEffect(() => {
+    setIndex(0)
+  }, [galleryKey])
 
   const safeIndex = count ? Math.min(index, count - 1) : 0
   const current = gallery[safeIndex]
@@ -193,7 +234,7 @@ export default function PhoneGallery({ phone }: { phone: GalleryPhone }) {
     const timer = window.setTimeout(() => targets.forEach(preloadImage), PRELOAD_DELAY_MS)
     return () => window.clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safeIndex, count])
+  }, [safeIndex, count, galleryKey])
 
   const mainSrc = current ? resizeImageUrl(current, MAIN_PX) : ''
   const mainSrc1x = current ? resizeImageUrl(current, MAIN_PX_1X) : ''
