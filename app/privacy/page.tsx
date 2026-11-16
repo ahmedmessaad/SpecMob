@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 const EFFECTIVE_DATE = 'August 1, 2026'
-const LAST_UPDATED = 'October 9, 2026'
+const LAST_UPDATED = 'November 16, 2026'
 
 const SECTIONS = [
   { id: 's1', label: '1. Information We Collect' },
@@ -118,7 +118,8 @@ export default function PrivacyPage() {
               </p>
               <Bullets items={[
                 'Remembering display preferences (e.g. a saved comparison list), stored in your browser only, not on our servers',
-                'Advertising, via Google AdSense or similar ad networks, which may set their own cookies to serve and measure ads',
+                'Advertising, via Google AdSense, which may set cookies or use similar technologies to serve and measure ads',
+                'Remembering your consent choice, where a consent message is shown (visitors in the European Economic Area, the United Kingdom and Switzerland)',
                 'Affiliate link tracking, so retailers can attribute a purchase to Specmob when you click through',
               ]} />
               <P>You can disable cookies in your browser at any time; some personalization features (like a saved comparison) simply won&apos;t persist without them.</P>
@@ -138,7 +139,7 @@ export default function PrivacyPage() {
               <H2 id="s3">3. Third-Party Services</H2>
               <p style={{ fontSize: 15, color: c.text2, lineHeight: 1.7, marginBottom: 8 }}>Specmob uses or may use:</p>
               <Bullets items={[
-                <><strong style={{ color: c.text1 }}>Advertising networks</strong> (e.g. Google AdSense) — may collect data per their own privacy policies to serve relevant ads. See Google&apos;s policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: c.accent }}>policies.google.com/privacy</a>.</>,
+                <><strong style={{ color: c.text1 }}>Advertising</strong> (Google AdSense) — ads are labelled and never influence rankings, scores or verdicts. Google may collect data to serve and measure ads; in the European Economic Area, the United Kingdom and Switzerland, personalized advertising and analytics storage are off until you choose otherwise in the consent message. See Google&apos;s policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: c.accent }}>policies.google.com/privacy</a>.</>,
                 <><strong style={{ color: c.text1 }}>Affiliate programs</strong> (e.g. Amazon Associates, eBay Partner Network) — when you click a &quot;Buy&quot; or &quot;Where to Buy&quot; link, you leave Specmob and that retailer&apos;s own privacy policy applies to your activity on their site.</>,
                 <><strong style={{ color: c.text1 }}>AI text generation</strong> — used to generate comparison verdicts and recommendation explanations from phone specification data.</>,
                 <><strong style={{ color: c.text1 }}>Analytics</strong> — used in aggregate to understand traffic patterns and improve the site.</>,
@@ -160,6 +161,7 @@ export default function PrivacyPage() {
               <H2 id="s6">6. Your Choices</H2>
               <Bullets items={[
                 'Disable cookies via your browser settings.',
+                'Where a consent message is shown, change your choice at any time using the privacy settings option the message provides, or clear this site\'s data in your browser.',
                 <>Opt out of personalized advertising via <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style={{ color: c.accent }}>Google Ads Settings</a> or the <a href="https://optout.aboutads.info" target="_blank" rel="noopener noreferrer" style={{ color: c.accent }}>Digital Advertising Alliance opt-out</a>.</>,
                 'Contact us to ask what data, if any, we hold relating to a specific request you made (e.g. via IP) — as noted above, we do not maintain individual user profiles.',
               ]} />
