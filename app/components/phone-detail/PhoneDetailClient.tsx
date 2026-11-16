@@ -503,6 +503,8 @@ function PhoneDetailInner({ phone, similar, compareWith, nextSteps, fullSpecs }:
           <ReviewSection phone={phone} analysis={phone.analysis ?? null} fallbackSections={overviewSections} />
         </section>
 
+        <AdSlot id="phone-2" />
+
         {hasSpecs && (
           <section id="specs" style={{ scrollMarginTop: SECTION_OFFSET, margin: '40px 0 48px', minWidth: 0 }}>
             <h2 style={{ fontFamily: f.serif, fontSize: 24, color: c.text1, fontWeight: 400, marginBottom: 16 }}>
@@ -530,7 +532,7 @@ function PhoneDetailInner({ phone, similar, compareWith, nextSteps, fullSpecs }:
           <PriceHistoryChart points={history} loading={historyLoading} />
         </div>
 
-        <AdSlot placement="rectangle" />
+        <AdSlot id="phone-1" />
 
         {similarList.length > 0 && (
           <section style={{ marginTop: 8, marginBottom: 40, minWidth: 0 }}>
