@@ -1172,9 +1172,10 @@ function CompareContent({
               <>
                 <VerdictHero phones={phones} verdict={verdict} winnerId={activeWinnerId} loading={verdictLoading} />
                 <CategoryBreakdown phones={phones} />
+                <AdSlot id="compare-2" />
                 <SpecTable phones={phones} />
-                <AdSlot placement="inline" />
                 <BottomLine phones={phones} verdict={verdict} winnerId={activeWinnerId} loading={verdictLoading} />
+                <AdSlot id="compare-1" />
               </>
             )}
 
