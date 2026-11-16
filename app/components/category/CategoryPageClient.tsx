@@ -327,7 +327,8 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
                 onCompare={handleCompare}
                 isCompared={compareIds.includes(phone.id)}
               />
-              {i === 2 && <div style={{ margin: '20px 0' }}><AdSlot placement="inline" /></div>}
+              {i === 4 && phones.length >= 7 && <AdSlot id="category-1" />}
+              {i === 9 && phones.length >= 12 && <AdSlot id="category-2" />}
             </Fragment>
           ))
         )}
@@ -347,6 +348,8 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
           </Link>
         </section>
 
+        {phones.length > 0 && phones.length < 7 && <AdSlot id="category-1" />}
+
         {data.next_steps.length > 0 && (
           <section aria-label="Next steps" data-nosnippet style={{ marginTop: 32 }}>
             <h2 style={{ fontFamily: f.serif, fontSize: 20, color: c.text1, fontWeight: 400, marginBottom: 12 }}>Where to next</h2>
@@ -365,8 +368,6 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             </div>
           </section>
         )}
-
-        <div style={{ marginTop: 40 }}><AdSlot placement="inline" /></div>
 
         <section aria-label="More rankings" data-nosnippet style={{ marginTop: 40 }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: c.text3, marginBottom: 14 }}>More rankings</h2>
