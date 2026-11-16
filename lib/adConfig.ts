@@ -1,13 +1,29 @@
 export const ADS_ENABLED = process.env.NEXT_PUBLIC_ADS_ENABLED === 'true'
-export const USE_PLACEHOLDERS = process.env.NEXT_PUBLIC_ADS_PLACEHOLDER !== 'false'
+export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? 'ca-pub-1305053412724153'
+export const AD_DEV_PLACEHOLDERS = process.env.NODE_ENV !== 'production'
 
-export type AdSize = { width: number; height: number; label: string }
+export const AD_LOAD_MARGIN = '50% 0px'
 
-export const AD_SIZES = {
-  leaderboard: { width: 728, height: 90, label: '728x90' },
-  rectangle:   { width: 300, height: 250, label: '300x250' },
-  skyscraper:  { width: 300, height: 600, label: '300x600' },
-  inline:      { width: 728, height: 90, label: '728x90' },
-} as const satisfies Record<string, AdSize>
+export type AdSlotConfig = {
+  enabled: boolean
+  unit: string
+  minHeight: { base: number; md: number }
+}
 
-export type AdPlacement = keyof typeof AD_SIZES
+const unit = (enabled: boolean): AdSlotConfig => ({
+  enabled,
+  unit: '',
+  minHeight: { base: 280, md: 250 },
+})
+
+export const AD_SLOTS = {
+  'category-1': unit(true),
+  'category-2': unit(false),
+  'phone-1': unit(true),
+  'phone-2': unit(false),
+  'compare-1': unit(true),
+  'compare-2': unit(false),
+  'brand-1': unit(true),
+} as const satisfies Record<string, AdSlotConfig>
+
+export type AdSlotId = keyof typeof AD_SLOTS
