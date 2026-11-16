@@ -237,3 +237,9 @@ textarea:focus-visible {
 @media (max-width: 640px) {
   :root { --page-px: 16px; }
 }
+
+/* ─── Ad slots: reserved space per breakpoint ────────────────────────────────*/
+.ad-slot { min-height: var(--ad-h-base); contain: layout; }
+@media (min-width: 768px) {
+  .ad-slot { min-height: var(--ad-h-md); }
+}
