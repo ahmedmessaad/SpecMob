@@ -5,6 +5,7 @@ import localFont from 'next/font/local'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from 'next/script'
 import { ToastProvider } from '@/app/components/Toast'
 import { CompareProvider } from '@/lib/compareStore'
 import PageViewTracker from '@/app/components/PageViewTracker'
@@ -46,9 +47,14 @@ const SITE_NAME = 'Specmob'
 const SITE_DESCRIPTION =
   'Compare phone specs, prices and scores. Ranked on hardware, never on sponsors.'
 const SOCIAL_DESCRIPTION = 'Compare phones side-by-side with honest specs and verdicts.'
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-T7WV2C51YF'
+const CONSENT_REGIONS = [
+  'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT',
+  'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'GB', 'CH',
+]
 
-const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? 'ca-pub-1305053412724153'
+const CONSENT_DEFAULT = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:${JSON.stringify(CONSENT_REGIONS)},wait_for_update:500});`
+
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-T7WV2C51YF'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -90,7 +96,6 @@ export const metadata: Metadata = {
     description: SOCIAL_DESCRIPTION,
     images: ['/og-image.png'],
   },
-  other: { 'google-adsense-account': ADSENSE_CLIENT },
 }
 
 export const viewport: Viewport = {
@@ -103,6 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${sans.variable} ${serif.variable} ${wordmark.variable}`}>
+        <Script id="consent-default" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULT }} />
         <DataNoticeBanner />
         <RegionProvider>
           <ToastProvider>
