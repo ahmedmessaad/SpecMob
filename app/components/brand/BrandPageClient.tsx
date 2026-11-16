@@ -208,7 +208,7 @@ function BrandContent({ stats, phones }: Props) {
           </p>
         </section>
 
-        <div style={{ marginTop: 40 }}><AdSlot placement="inline" /></div>
+        <AdSlot id="brand-1" />
 
         {stats.similar_brands.length > 0 && (
           <section aria-labelledby="similar-brands" style={{ marginTop: 44 }}>
