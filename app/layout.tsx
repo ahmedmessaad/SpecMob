@@ -48,6 +48,8 @@ const SITE_DESCRIPTION =
 const SOCIAL_DESCRIPTION = 'Compare phones side-by-side with honest specs and verdicts.'
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-T7WV2C51YF'
 
+const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? 'ca-pub-1305053412724153'
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -88,6 +90,7 @@ export const metadata: Metadata = {
     description: SOCIAL_DESCRIPTION,
     images: ['/og-image.png'],
   },
+  other: { 'google-adsense-account': ADSENSE_CLIENT },
 }
 
 export const viewport: Viewport = {
