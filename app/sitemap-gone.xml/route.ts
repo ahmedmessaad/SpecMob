@@ -2,10 +2,19 @@ import { SITE_URL } from '@/lib/config'
 import { isDuplicateBrandPath } from '@/lib/dupes'
 import { collect, respond, xml } from '@/lib/sitemap-xml'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const phones = await collect('phones')
+  let phones: Awaited<ReturnType<typeof collect>>
+  try {
+    phones = await collect('phones')
+  } catch {
+    return new Response('Sitemap temporarily unavailable', {
+      status: 503,
+      headers: { 'Retry-After': '300', 'Cache-Control': 'no-store' },
+    })
+  }
+
   const seen = new Set<string>()
 
   for (const p of phones) {
