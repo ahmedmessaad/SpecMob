@@ -31,3 +31,14 @@ export async function collect(section: SitemapSection['section']): Promise<Sitem
   }
   return out
 }
+
+export async function serve(build: () => Promise<U[]>) {
+  try {
+    return respond(xml(await build()))
+  } catch {
+    return new Response('Sitemap temporarily unavailable', {
+      status: 503,
+      headers: { 'Retry-After': '300', 'Cache-Control': 'no-store' },
+    })
+  }
+}
