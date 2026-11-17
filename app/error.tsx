@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { CONTACT_EMAIL } from '@/lib/config'
 import { c, f, r, sh } from '@/lib/tokens'
 
 export default function Error({
@@ -12,10 +13,8 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[Specmob] Unhandled error:', error)
+    console.error('[Specmob] Unhandled error', error.digest ?? '')
   }, [error])
-
-  const digest = error.digest ?? 'unknown'
 
   return (
     <div style={{
@@ -118,7 +117,7 @@ export default function Error({
             letterSpacing: '0.5px',
             marginBottom: 20,
           }}>
-            500 — Server Error
+            Error
           </div>
 
           <h1 style={{
@@ -137,11 +136,10 @@ export default function Error({
             lineHeight: 1.65,
             marginBottom: 28,
           }}>
-            An unexpected error occurred on our end. Your data is safe — nothing was lost.
-            Try again now, or come back in a moment if the problem persists.
+            We could not load this page. Try again, or come back in a moment.
           </p>
 
-          <div style={{ display: 'flex', gap: 10, marginBottom: 28, flexWrap: 'wrap' as const }}>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' as const }}>
             <button
               onClick={reset}
               style={{
@@ -186,42 +184,10 @@ export default function Error({
             </Link>
           </div>
 
-          <details style={{
-            border: `1px solid ${c.border}`,
-            borderRadius: r.md,
-            overflow: 'hidden',
-            marginBottom: 24,
-          }}>
-            <summary style={{
-              padding: '10px 14px',
-              fontSize: 13,
-              fontWeight: 500,
-              color: c.text3,
-              cursor: 'pointer',
-              userSelect: 'none' as const,
-              background: c.bg,
-              listStyle: 'none',
-            }}>
-              Technical details
-            </summary>
-            <div style={{
-              background: c.primary,
-              color: 'rgba(255,255,255,0.7)',
-              padding: '14px 16px',
-              fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
-              fontSize: 12,
-              lineHeight: 1.7,
-            }}>
-              <div>digest: {digest}</div>
-              <div>message: {error.message || 'No message available'}</div>
-              <div>time: {new Date().toISOString()}</div>
-            </div>
-          </details>
-
           <p style={{ fontSize: 12, color: c.text3, textAlign: 'center' as const }}>
             Problem persisting?{' '}
             <a
-              href="mailto:ahmed.messaad.ml@gmail.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               style={{ color: c.text2, textDecoration: 'underline' }}
             >
               Contact us
