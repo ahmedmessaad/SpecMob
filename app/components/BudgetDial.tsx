@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { c, f } from '@/lib/tokens'
-import { DIAL_MAX, DIAL_MIN, dialRatioFromValue, dialValueFromRatio, stepDial } from '@/lib/priceTiers'
+import { c, f, r } from '@/lib/tokens'
+import { DIAL_MAX, DIAL_MIN, clampDial, dialRatioFromValue, dialValueFromRatio, stepDial } from '@/lib/priceTiers'
 
 // Rolls the displayed number toward the target ~22% of the remaining distance per frame,
 // so $1 steps and fast drags both feel smooth. Reduced-motion users get the value directly.
@@ -35,7 +35,50 @@ function useAnimatedNumber(target: number): number {
   return Math.round(shown)
 }
 
-export default function BudgetDial({ value, onChange, big = false, disabled = false }: { value: number; onChange: (v: number) => void; big?: boolean; disabled?: boolean }) {
+function AmountInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [text, setText] = useState(String(value))
+  const focused = useRef(false)
+
+  useEffect(() => {
+    if (!focused.current) setText(String(value))
+  }, [value])
+
+  const commit = () => {
+    const n = parseInt(text, 10)
+    if (Number.isNaN(n)) { setText(String(value)); return }
+    const next = clampDial(n)
+    setText(String(next))
+    if (next !== value) onChange(next)
+  }
+
+  return (
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginTop: 6, fontSize: 13, color: c.text3 }}>
+      Or type an amount
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 12px', border: `1.5px solid ${c.border}`, borderRadius: r.md, background: c.surface }}>
+        <span style={{ color: c.text3, fontWeight: 500 }}>$</span>
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          autoComplete="off"
+          aria-label="Budget amount in US dollars"
+          value={text}
+          onFocus={e => { focused.current = true; e.currentTarget.select() }}
+          onChange={e => setText(e.target.value.replace(/\D/g, '').slice(0, 5))}
+          onBlur={() => { focused.current = false; commit() }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { e.preventDefault(); commit(); e.currentTarget.blur() }
+            if (e.key === 'Escape') { setText(String(value)); e.currentTarget.blur() }
+          }}
+          style={{ width: 64, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, fontWeight: 600, color: c.text1, fontVariantNumeric: 'tabular-nums' }}
+        />
+      </span>
+      <span style={{ fontSize: 11.5 }}>{DIAL_MIN} to {DIAL_MAX} ({DIAL_MAX} = no limit)</span>
+    </label>
+  )
+}
+
+export default function BudgetDial({ value, onChange, big = false, disabled = false, showInput = false }: { value: number; onChange: (v: number) => void; big?: boolean; disabled?: boolean; showInput?: boolean }) {
   const track = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
   const pct = dialRatioFromValue(value) * 100
@@ -89,6 +132,7 @@ export default function BudgetDial({ value, onChange, big = false, disabled = fa
         <span className="bd-min">$100</span>
         <span className="bd-max">$2,000+</span>
       </div>
+      {showInput && <AmountInput value={value} onChange={onChange} />}
       <style>{`
         .bd-slider{position:relative;height:52px;margin-top:14px;touch-action:none;cursor:pointer;max-width:560px}
         .bd-rail{position:absolute;left:0;right:0;top:20px;height:6px;border-radius:3px;background:var(--border);overflow:hidden}
