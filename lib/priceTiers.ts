@@ -89,6 +89,7 @@ export const BUDGET_CEILING_RATIO = 1.05
 export const DEFAULT_DIAL_VALUE = 550
 export const DIAL_MIN = 100
 export const DIAL_MAX = 2000 // at this value the ceiling is removed
+export const DIAL_STEP = 10 // drag and arrow-key granularity; typed values are exact
 
 export function budgetBounds(budget: number): { min: number; max: number | null } {
   return {
@@ -97,7 +98,7 @@ export function budgetBounds(budget: number): { min: number; max: number | null 
   }
 }
 
-// Non-linear dial: more resolution in the common $100-$1000 range. Moves in $1 steps.
+// Non-linear dial: more resolution in the common $100-$1000 range. Drag snaps to DIAL_STEP.
 const STOPS: readonly (readonly [number, number])[] = [
   [0, DIAL_MIN],
   [0.45, 400],
@@ -105,7 +106,8 @@ const STOPS: readonly (readonly [number, number])[] = [
   [1, DIAL_MAX],
 ]
 
-const clamp = (v: number) => Math.min(DIAL_MAX, Math.max(DIAL_MIN, v))
+export const clampDial = (v: number) => Math.min(DIAL_MAX, Math.max(DIAL_MIN, v))
+const clamp = clampDial
 
 export function dialValueFromRatio(t: number): number {
   const r = Math.min(1, Math.max(0, t))
@@ -114,7 +116,7 @@ export function dialValueFromRatio(t: number): number {
   const [p1, v1] = STOPS[i - 1]
   const [p2, v2] = STOPS[i]
   const raw = v1 + ((r - p1) / (p2 - p1)) * (v2 - v1)
-  return clamp(Math.round(raw))
+  return clamp(Math.round(raw / DIAL_STEP) * DIAL_STEP)
 }
 
 export function dialRatioFromValue(value: number): number {
@@ -126,6 +128,9 @@ export function dialRatioFromValue(value: number): number {
   return p1 + ((x - v1) / (v2 - v1)) * (p2 - p1)
 }
 
-export function stepDial(value: number, dir: 1 | -1, amount = 1): number {
-  return clamp(value + dir * amount)
+// multiplier 1 moves to the next DIAL_STEP multiple; 10 (Shift) moves in 10x steps.
+export function stepDial(value: number, dir: 1 | -1, multiplier = 1): number {
+  const step = DIAL_STEP * multiplier
+  const snapped = dir === 1 ? Math.floor(value / step) * step + step : Math.ceil(value / step) * step - step
+  return clamp(snapped)
 }
