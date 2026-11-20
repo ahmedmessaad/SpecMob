@@ -131,6 +131,7 @@ function BudgetPicker({
           value={budget}
           onChange={onBudget}
           disabled={!!tierId}
+          showInput
         />
       </div>
 
@@ -539,16 +540,14 @@ function ResultCard({
 // now rendered *inside* StepResults when loading, and the duplicate
 // top-level spinner block in PickPageContent has been removed.
 function StepResults({
-  phones, priorities, budget, onBudget, tierId, onTier, onCompare, onEditPriorities, compareIds, meta, loading,
+  phones, priorities, budget, tierId, onApply, onCompare, compareIds, meta, loading,
 }: {
   phones: Phone[]
   priorities: string[]
   budget: number
-  onBudget: (v: number) => void
   tierId: PriceTierId | null
-  onTier: (t: PriceTierId | null) => void
+  onApply: (next: { budget: number; tierId: PriceTierId | null; priorities: string[] }) => void
   onCompare: (p: Phone) => void
-  onEditPriorities: () => void
   compareIds: number[]
   meta: {
     budgetWidened: boolean
@@ -566,7 +565,11 @@ function StepResults({
   const [fallback, setFallback] = useState<Phone[]>([])
   const [fallbackScope, setFallbackScope] = useState<'budget' | 'all'>('budget')
   const [fallbackLoading, setFallbackLoading] = useState(false)
-  const [adjusting, setAdjusting] = useState(false)
+  const [panel, setPanel] = useState<'budget' | 'priorities' | null>(null)
+  const [draftBudget, setDraftBudget] = useState(budget)
+  const [draftTier, setDraftTier] = useState<PriceTierId | null>(tierId)
+  const [draftPriorities, setDraftPriorities] = useState<string[]>(priorities)
+  const adjusting = panel !== null
   const activeTier = tierId ? getPriceTier(tierId) : null
   const bounds = budgetBounds(budget)
   const money = (n: number) => `$${n.toLocaleString('en-US')}`
@@ -578,6 +581,30 @@ function StepResults({
     : bounds.max == null ? `${money(bounds.min)}+` : `${money(bounds.min)} – ${money(bounds.max)}`
   const pill: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', padding: '5px 12px', borderRadius: r.full, background: c.surface, border: `1px solid ${c.border}`, fontSize: 12.5, color: c.text2, fontWeight: 500 }
   const linkBtn: React.CSSProperties = { background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: c.primary, fontSize: 13, fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }
+  const openPanel = (next: 'budget' | 'priorities') => {
+    if (panel === next) { setPanel(null); return }
+    if (panel === null) {
+      setDraftBudget(budget)
+      setDraftTier(tierId)
+      setDraftPriorities(priorities)
+    }
+    setPanel(next)
+  }
+  const toggleDraftPriority = (id: string) => {
+    setDraftPriorities(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id)
+      return prev.length < 3 ? [...prev, id] : prev
+    })
+  }
+  const dirty =
+    draftTier !== tierId ||
+    (draftTier === null && draftBudget !== budget) ||
+    [...draftPriorities].sort().join(',') !== [...priorities].sort().join(',')
+  const applyDraft = () => {
+    if (dirty) onApply({ budget: draftBudget, tierId: draftTier, priorities: draftPriorities })
+    setPanel(null)
+  }
+  const cancelDraft = () => setPanel(null)
   useEffect(() => {
     if (loading || phones.length > 0) { setFallback([]); return }
     let cancelled = false
@@ -609,16 +636,66 @@ function StepResults({
         <span style={pill}>{activeTier ? `${activeTier.name} · ` : ''}{rangeText}</span>
         {priorityLabels.map(l => <span key={l} style={pill}>{l}</span>)}
         <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 16 }}>
-          <button type="button" style={linkBtn} aria-expanded={adjusting} onClick={() => setAdjusting(v => !v)}>
-            {adjusting ? 'Done' : 'Adjust budget'}
+          <button type="button" style={linkBtn} aria-expanded={panel === 'budget'} onClick={() => openPanel('budget')}>
+            Adjust budget
           </button>
-          <button type="button" style={linkBtn} onClick={onEditPriorities}>Change priorities</button>
+          <button type="button" style={linkBtn} aria-expanded={panel === 'priorities'} onClick={() => openPanel('priorities')}>
+            Change priorities
+          </button>
         </span>
       </div>
 
       {adjusting && (
-        <div style={{ background: c.surface, border: `1px solid ${c.border}`, borderRadius: r.lg, padding: '18px 20px 14px', marginBottom: 22 }}>
-          <BudgetPicker budget={budget} onBudget={onBudget} tierId={tierId} onTier={onTier} compact showTiers />
+        <div style={{ background: c.surface, border: `1px solid ${c.border}`, borderRadius: r.lg, padding: '18px 20px 16px', marginBottom: 22 }}>
+          {panel === 'budget' ? (
+            <BudgetPicker budget={draftBudget} onBudget={setDraftBudget} tierId={draftTier} onTier={setDraftTier} compact showTiers />
+          ) : (
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: c.text2, marginBottom: 12 }}>
+                What matters most?{' '}
+                <span style={{ color: c.text3, fontWeight: 500 }}>(up to 3, {draftPriorities.length} selected)</span>
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {PRIORITIES.map(p => {
+                  const active = draftPriorities.includes(p.id)
+                  const dimmed = draftPriorities.length >= 3 && !active
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      aria-pressed={active}
+                      disabled={dimmed}
+                      onClick={() => toggleDraftPriority(p.id)}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 14px', borderRadius: r.full,
+                        border: `1.5px solid ${active ? c.primary : c.border}`,
+                        background: active ? c.primary : c.surface,
+                        color: active ? '#fff' : c.text2,
+                        fontSize: 13, fontWeight: 500, cursor: dimmed ? 'not-allowed' : 'pointer',
+                        opacity: dimmed ? 0.4 : 1, transition: 'all 120ms ease',
+                      }}
+                    >
+                      <span style={{ display: 'flex', transform: 'scale(0.85)' }}>{p.icon}</span>
+                      {p.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 16, marginTop: 18 }}>
+            <button type="button" style={{ ...linkBtn, color: c.text3, textDecoration: 'none' }} onClick={cancelDraft}>Cancel</button>
+            <button
+              type="button"
+              onClick={applyDraft}
+              style={{
+                padding: '10px 24px', borderRadius: r.full, border: 'none', background: c.primary, color: '#fff',
+                fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
 
@@ -757,6 +834,13 @@ function PickPageContent() {
   }, [router])
   const handleBudget = (v: number) => { if (tierId) return; setBudget(v); commit(step, v, null, priorities) }
   const handleTier = (t: PriceTierId | null) => { setTierId(t); commit(step, budget, t, priorities) }
+  const handleApply = (next: { budget: number; tierId: PriceTierId | null; priorities: string[] }) => {
+    const pSet = new Set(next.priorities)
+    setBudget(next.budget)
+    setTierId(next.tierId)
+    setPriorities(pSet)
+    commit(3, next.budget, next.tierId, pSet)
+  }
   const handlePriorityToggle = (id: string) => {
     const next = new Set(priorities)
     if (next.has(id)) next.delete(id)
@@ -851,11 +935,9 @@ function PickPageContent() {
             phones={results}
             priorities={Array.from(priorities)}
             budget={budget}
-            onBudget={handleBudget}
             tierId={tierId}
-            onTier={handleTier}
+            onApply={handleApply}
             onCompare={handleCompare}
-            onEditPriorities={goBack}
             compareIds={compareIds}
             meta={recommendMeta}
             loading={loading}
