@@ -49,7 +49,7 @@ function withParams(path: string, params: Record<string, string | number>): stri
  * Returns null for anything that looks like a normal phone-name search.
  *
  * NOTE: the /pick query parameter names (budget, priority) are defined here and
- * nowhere else. Adjust them if the Help Me Choose page reads different ones.
+ * nowhere else. Adjust them if the Pick a phone page reads different ones.
  */
 export function resolveSearchIntent(raw: string): SearchIntent | null {
   const q = raw.trim().toLowerCase()

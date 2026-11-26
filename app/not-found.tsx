@@ -84,16 +84,16 @@ function NotFoundContent() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 40, marginTop: 24 }}>
             <Link href={ROUTES.home} style={{ padding: '11px 24px', background: c.primary, color: 'white', borderRadius: 'var(--r-full)', fontSize: 14, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              Go Home
+              Go home
             </Link>
             <Link href={ROUTES.best} style={{ padding: '11px 24px', border: `1px solid ${c.border}`, color: c.text2, borderRadius: 'var(--r-full)', fontSize: 14, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              Browse Best Phones
+              Browse best phones
             </Link>
             <Link href={ROUTES.brands} style={{ padding: '11px 24px', border: `1px solid ${c.border}`, color: c.text2, borderRadius: 'var(--r-full)', fontSize: 14, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              Browse Brands
+              Browse brands
             </Link>
             <Link href={ROUTES.pick} style={{ padding: '11px 24px', border: `1px solid var(--accent-border)`, color: 'var(--accent)', borderRadius: 'var(--r-full)', fontSize: 14, fontWeight: 500, background: 'var(--accent-light)', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-              Help Me Choose →
+              Pick a phone →
             </Link>
           </div>
 
@@ -128,9 +128,9 @@ function NotFoundContent() {
             Specmob
           </div>
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <Link href={ROUTES.best} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>Best Phones</Link>
+            <Link href={ROUTES.best} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>Best phones</Link>
             <Link href={ROUTES.compare} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>Compare</Link>
-            <Link href={ROUTES.pick} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>Help Me Choose</Link>
+            <Link href={ROUTES.pick} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>Pick a phone</Link>
             <Link href={ROUTES.about} style={{ fontSize: 13, color: '#A0A0B0', transition: 'color 0.15s' }}>About</Link>
           </div>
           <span style={{ fontSize: 12, color: '#6A6A7A' }}>© {new Date().getFullYear()} Specmob</span>

@@ -522,8 +522,8 @@ function PickPageContent() {
       <main className="pk-main">
         <div className="pk-wrap">
           <aside className="pk-rail-col">
-            <h1>Which phone should you buy?</h1>
-            <p className="pk-rail-sub">Two quick questions, then a ranked top 5 with the trade-offs spelled out.</p>
+            <h1>Pick a phone</h1>
+            <p className="pk-rail-sub">Which phone should you buy? Two quick questions, then a ranked top 5 with the trade-offs spelled out.</p>
 
             <nav aria-label="Progress">
               <div className="pk-bar" aria-hidden="true"><i style={{ width: `${(step / 3) * 100}%` }} /></div>
@@ -706,7 +706,7 @@ function PickPageContent() {
               <p>
                 Phones are scored the same way for every brand, and sponsors or affiliate links never change a result. Your budget sets the range, your priorities decide the order, and no brand takes more than two of the five slots. If you pick a strict requirement such as foldable, phones without it are left out.
               </p>
-              <Link href={ROUTES.methodology} className="pk-textlink">Read our ranking methodology</Link>
+              <Link href={ROUTES.methodology} className="pk-textlink">How we score</Link>
             </article>
             <article>
               <h2>Want more options?</h2>

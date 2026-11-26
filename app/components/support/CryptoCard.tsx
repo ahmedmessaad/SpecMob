@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { c, r } from '@/lib/tokens'
+import { c } from '@/lib/tokens'
 import type { CryptoAddress } from '@/lib/supportData'
 
 export default function CryptoCard({ entries }: { entries: CryptoAddress[] }) {
@@ -15,20 +15,17 @@ export default function CryptoCard({ entries }: { entries: CryptoAddress[] }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 420, margin: '0 auto' }}>
+    <div style={{ borderTop: `1px solid ${c.border}` }}>
       {entries.map(e => (
         <div
           key={e.network}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-            background: c.surface, border: `1px solid ${c.border}`, borderRadius: r.md,
-          }}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0', borderBottom: `1px solid ${c.border}` }}
         >
-          <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: c.text3, marginBottom: 2 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, color: c.text3, marginBottom: 3 }}>
               {e.label} · {e.network}
             </div>
-            <div style={{ fontSize: 12, color: c.text1, fontFamily: 'monospace', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ fontSize: 12.5, color: c.text1, fontFamily: 'monospace', overflowWrap: 'anywhere' }}>
               {e.address}
             </div>
           </div>

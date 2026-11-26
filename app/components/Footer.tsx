@@ -31,17 +31,17 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Specmob',
     links: [
-      { label: 'About', href: ROUTES.about },
+      { label: 'About Specmob', href: ROUTES.about },
       { label: 'How we score', href: ROUTES.methodology },
-      { label: 'Contact', href: ROUTES.contact },
+      { label: 'Contact Specmob', href: ROUTES.contact },
       { label: 'Fund Specmob', href: ROUTES.fund },
     ],
   },
 ]
 
 const LEGAL: FooterLink[] = [
-  { label: 'Privacy', href: ROUTES.privacy },
-  { label: 'Terms', href: ROUTES.terms },
+  { label: 'Privacy policy', href: ROUTES.privacy },
+  { label: 'Terms of use', href: ROUTES.terms },
 ]
 
 const SOCIALS = [

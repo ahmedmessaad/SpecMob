@@ -212,7 +212,7 @@ function PhoneColumn({ phone, onRemove, isWinner }: { phone: Phone; onRemove: ()
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = c.primary; (e.currentTarget as HTMLElement).style.color = c.text1 }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = c.border; (e.currentTarget as HTMLElement).style.color = c.text2 }}
         >
-          Details
+          View specs
         </Link>
       </div>
     </div>
@@ -1260,7 +1260,7 @@ function CompareContent({
                   </div>
                 </div>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 22px', background: '#fff', color: c.text1, fontSize: 14, fontWeight: 700, borderRadius: r.full, whiteSpace: 'nowrap' }}>
-                  Help me choose <span aria-hidden="true">→</span>
+                  Pick a phone <span aria-hidden="true">→</span>
                 </span>
               </Link>
             </section>
@@ -1333,7 +1333,7 @@ function CompareContent({
                 <Search size={15} /> Browse All Phones
               </Link>
               <Link href="/pick" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '11px 24px', border: '1px solid var(--accent-border)', color: c.accent, borderRadius: r.full, fontSize: 14, fontWeight: 500, transition: 'all 0.15s' }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'var(--accent-light)' }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}>
-                Not sure? Help Me Choose →
+                Not sure? Pick a phone →
               </Link>
             </div>
           </>

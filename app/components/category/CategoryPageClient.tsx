@@ -123,7 +123,7 @@ function RankCard({
             </a>
           )}
           <Link href={phone.path} className={`rk-btn${buy ? '' : ' is-primary'}`}>
-            Details
+            View specs
             {!buy && <ArrowRight size={15} />}
           </Link>
           <button type="button" className={`rk-btn${isCompared ? ' is-active' : ''}`} onClick={() => onCompare(phone)} aria-pressed={isCompared}>
@@ -182,31 +182,12 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
         <nav aria-label="Breadcrumb" style={{ padding: '16px 0 0', fontSize: 12.5, color: c.text3, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <Link href={ROUTES.home} style={{ color: c.text2 }}>Home</Link>
           <ChevronRight size={11} color={c.text3} />
-          <Link href={ROUTES.best} style={{ color: c.text2 }}>Best Phones</Link>
+          <Link href={ROUTES.best} style={{ color: c.text2 }}>Best phones</Link>
           <ChevronRight size={11} color={c.text3} />
           <span aria-current="page">{data.title}</span>
         </nav>
 
-        <div className="category-tabs" data-nosnippet style={{ marginTop: 20, overflowX: 'auto', scrollbarWidth: 'none', borderBottom: `1px solid ${c.border}` }}>
-          <div style={{ display: 'flex', gap: 0, minWidth: 'max-content' }}>
-            {categories.map(cat => {
-              const active = cat.slug === data.slug
-              const catPal = paletteFor(cat.slug)
-              return (
-                <Link
-                  key={cat.slug}
-                  href={cat.path}
-                  style={{ padding: '11px 16px', fontSize: 12.5, fontWeight: 500, color: active ? c.text1 : c.text3, whiteSpace: 'nowrap', borderBottom: `2px solid ${active ? catPal.iconColor : 'transparent'}`, display: 'flex', alignItems: 'center', gap: 6 }}
-                >
-                  <span style={{ color: active ? catPal.iconColor : 'inherit', display: 'flex', alignItems: 'center' }}>{categoryIcon(cat.slug)}</span>
-                  {shortLabel(cat.title)}
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="hero-section" style={{ padding: '32px 0 28px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 28, flexWrap: 'wrap' }}>
+        <div className="hero-section" style={{ padding: '24px 0 28px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 28, flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 280 }}>
             <div data-nosnippet style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: pal.bg, borderRadius: 'var(--r-full)', fontSize: 11.5, fontWeight: 600, color: pal.iconColor, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 16 }}>
               <TrendingUp size={12} />
@@ -222,7 +203,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             </div>
             <p style={{ fontSize: 15, color: c.text2, lineHeight: 1.65, maxWidth: 620, marginBottom: 16 }}>
               {lede || data.description}{' '}
-              <a href="#methodology" data-nosnippet style={{ color: c.primary, fontWeight: 600, whiteSpace: 'nowrap' }}>How we rank</a>
+              <a href="#methodology" data-nosnippet style={{ color: c.primary, fontWeight: 600, whiteSpace: 'nowrap' }}>How we score</a>
             </p>
             {budgetLinks.length > 0 && (
               <p style={{ fontSize: 14, color: c.text2, lineHeight: 1.6, maxWidth: 620, marginBottom: 16 }}>
@@ -281,7 +262,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
         <section id="methodology" style={{ marginTop: 40, background: c.surface, border: `1px solid ${c.border}`, borderRadius: 'var(--r-lg)', padding: '22px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
             <BarChart3 size={17} color={c.text2} />
-            <h2 style={{ fontFamily: f.serif, fontSize: 18, color: c.text1, fontWeight: 400, margin: 0 }}>How we rank {label.toLowerCase()}</h2>
+            <h2 style={{ fontFamily: f.serif, fontSize: 18, color: c.text1, fontWeight: 400, margin: 0 }}>How we score {label.toLowerCase()}</h2>
           </div>
           <p data-nosnippet style={{ fontSize: 13.5, color: c.text2, lineHeight: 1.65, maxWidth: 680, marginBottom: 14 }}>{data.description}</p>
           <div style={{ padding: '11px 14px', background: pal.bg, borderRadius: 'var(--r-sm)', fontSize: 12.5, color: c.text2, lineHeight: 1.55, display: 'flex', gap: 9, alignItems: 'flex-start', marginBottom: 12 }}>
@@ -289,7 +270,7 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             <span>Rankings use listed specifications, not hands-on testing, so real-world results can differ. No brand sponsors these rankings.</span>
           </div>
           <Link href={ROUTES.methodology} style={{ fontSize: 13, fontWeight: 600, color: c.primary }}>
-            Read the full methodology
+            How we score
           </Link>
         </section>
 
@@ -331,12 +312,12 @@ function CategoryPageContent({ data, categories, year, updatedLabel, lede, trade
             })}
             <Link href={ROUTES.pick} className="hover-lift" style={{ background: c.primary, borderRadius: 'var(--r-md)', padding: '18px 16px', textDecoration: 'none', display: 'block' }}>
               <div style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', color: '#fff', marginBottom: 12 }}><Crosshair size={16} strokeWidth={1.5} /></div>
-              <div style={{ fontFamily: f.serif, fontSize: 15, color: '#fff', marginBottom: 10 }}>Help me choose</div>
+              <div style={{ fontFamily: f.serif, fontSize: 15, color: '#fff', marginBottom: 10 }}>Pick a phone</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: 4 }}>Try it <ArrowRight size={11} /></div>
             </Link>
             <Link href={ROUTES.tradein} className="hover-lift" style={{ background: c.surface, border: `1px solid ${c.border}`, borderRadius: 'var(--r-md)', padding: '18px 16px', textDecoration: 'none', display: 'block' }}>
               <div style={{ width: 30, height: 30, borderRadius: 'var(--r-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: c.bg, color: c.text1, marginBottom: 12 }}><RotateCcw size={16} strokeWidth={1.5} /></div>
-              <div style={{ fontFamily: f.serif, fontSize: 15, color: c.text1, marginBottom: 10 }}>Trade-in calculator</div>
+              <div style={{ fontFamily: f.serif, fontSize: 15, color: c.text1, marginBottom: 10 }}>Trade-in value</div>
               <div style={{ fontSize: 12, fontWeight: 600, color: c.text1, display: 'flex', alignItems: 'center', gap: 4 }}>Check value <ArrowRight size={11} /></div>
             </Link>
           </div>

@@ -57,7 +57,7 @@ export default async function CategoryPage({ params }: PageProps) {
       <JsonLd
         data={buildBreadcrumbList([
           { name: 'Home', path: ROUTES.home },
-          { name: 'Best Phones', path: ROUTES.best },
+          { name: 'Best phones', path: ROUTES.best },
           { name, path: data.path },
         ])}
       />

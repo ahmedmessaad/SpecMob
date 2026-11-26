@@ -37,7 +37,7 @@ export default async function BestHubPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: c.bg }}>
-      <JsonLd data={buildBreadcrumbList([{ name: 'Home', path: ROUTES.home }, { name: 'Best Phones', path: ROUTES.best }])} />
+      <JsonLd data={buildBreadcrumbList([{ name: 'Home', path: ROUTES.home }, { name: 'Best phones', path: ROUTES.best }])} />
       <JsonLd data={tiles.length ? buildItemList('Best phone rankings', tiles.map(t => ({ path: t.path, name: t.title }))) : null} />
       <Navbar />
 
@@ -45,19 +45,19 @@ export default async function BestHubPage() {
         <nav aria-label="Breadcrumb" style={{ padding: '16px 0 0', fontSize: 12.5, color: c.text3, display: 'flex', alignItems: 'center', gap: 6 }}>
           <Link href={ROUTES.home} style={{ color: c.text2 }}>Home</Link>
           <ChevronRight size={11} />
-          <span aria-current="page">Best Phones</span>
+          <span aria-current="page">Best phones</span>
         </nav>
 
         <header style={{ padding: '32px 0 28px' }}>
           <h1 style={{ fontFamily: f.serif, fontSize: 'clamp(30px,4vw,44px)', color: c.text1, letterSpacing: '-1px', lineHeight: 1.1, fontWeight: 400, marginBottom: 12 }}>
-            The best phones, ranked
+            Best phones
           </h1>
           <p style={{ fontSize: 15, color: c.text2, lineHeight: 1.65, maxWidth: 640, marginBottom: 12 }}>
             Every list is built from listed specifications and scored the same way for every brand. Pick what matters to you,
             or start from your budget.
           </p>
           <Link href={ROUTES.methodology} style={{ fontSize: 13, fontWeight: 600, color: c.primary }}>
-            How the rankings work
+            How we score
           </Link>
         </header>
 

@@ -8,10 +8,10 @@ export interface CompanyPage {
 }
 
 export const COMPANY_PAGES: Record<CompanyPageKey, CompanyPage> = {
-  about: { label: 'About', href: ROUTES.about },
+  about: { label: 'About Specmob', href: ROUTES.about },
   methodology: { label: 'How we score', href: ROUTES.methodology },
   fund: { label: 'Fund Specmob', href: ROUTES.fund },
-  contact: { label: 'Contact', href: ROUTES.contact },
-  privacy: { label: 'Privacy', href: ROUTES.privacy },
-  terms: { label: 'Terms', href: ROUTES.terms },
+  contact: { label: 'Contact Specmob', href: ROUTES.contact },
+  privacy: { label: 'Privacy policy', href: ROUTES.privacy },
+  terms: { label: 'Terms of use', href: ROUTES.terms },
 }

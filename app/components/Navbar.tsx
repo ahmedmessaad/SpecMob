@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CircleHelp, Menu, Search, X } from 'lucide-react'
+import { Crosshair, Menu, Search, X } from 'lucide-react'
 
 import { ROUTES } from '@/lib/config'
 import { c, f, z } from '@/lib/tokens'
@@ -137,8 +137,8 @@ export default function Navbar() {
           <div className="nb-right">
             <NavMenus pathname={pathname} compareCount={compareCount} compareHref={compareHref} />
             <Link prefetch={false} href={ROUTES.pick} className="nb-cta">
-              <CircleHelp size={14} strokeWidth={2} aria-hidden="true" />
-              Help Me Choose
+              <Crosshair size={14} strokeWidth={2} aria-hidden="true" />
+              Pick a phone
             </Link>
           </div>
 

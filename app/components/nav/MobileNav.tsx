@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import Link from 'next/link'
-import { ChevronDown, CircleHelp } from 'lucide-react'
+import { ChevronDown, Crosshair } from 'lucide-react'
 
 import { ROUTES } from '@/lib/config'
 import { c, z } from '@/lib/tokens'
@@ -120,8 +120,8 @@ export default function MobileNav({ top, autoFocusSearch, pathname, compareCount
         {!searchOpen && (
           <>
             <Link prefetch={false} href={ROUTES.pick} className="nb-cta nb-cta--block" onClick={onClose}>
-              <CircleHelp size={16} strokeWidth={2} aria-hidden="true" />
-              Help Me Choose
+              <Crosshair size={16} strokeWidth={2} aria-hidden="true" />
+              Pick a phone
             </Link>
 
             <div>

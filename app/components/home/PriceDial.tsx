@@ -194,14 +194,15 @@ function ResultCard({
       )}
 
       <div className="pd-actions">
-        <Link href={phone.path} prefetch={false} className="pd-btn-primary">View full specs</Link>
+        <Link href={phone.path} prefetch={false} className="pd-btn-primary">View specs</Link>
         <Link
           href={pickHref}
           prefetch={false}
           onClick={() => trackBlockClick('hero.top5', pickHref, 'home')}
           className="pd-btn-ghost"
         >
-          Top 5 matches
+          Top 5 picks
+          <ArrowRight size={14} aria-hidden="true" />
         </Link>
       </div>
     </div>
@@ -418,7 +419,7 @@ const PD_CSS = `
 .pd-actions{display:flex;gap:8px}
 .pd-btn-primary{flex:1;text-align:center;padding:10px 0;border-radius:var(--r-full);font-size:13px;font-weight:700;background:var(--primary);color:#fff;transition:background 150ms ease}
 .pd-btn-primary:hover{background:var(--primary-hover)}
-.pd-btn-ghost{flex:1;text-align:center;white-space:nowrap;padding:10px 12px;border-radius:var(--r-full);font-size:13px;font-weight:600;color:var(--text-2);border:1px solid var(--border);transition:border-color 150ms ease}
+.pd-btn-ghost{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;padding:10px 12px;border-radius:var(--r-full);font-size:13px;font-weight:600;color:var(--text-2);border:1px solid var(--border);transition:border-color 150ms ease}
 .pd-btn-ghost:hover{border-color:var(--primary);color:var(--text-1)}
 @media(max-width:380px){.pd-img{flex-basis:72px;height:88px}.pd-name{font-size:18px}}
 .pd-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:500;transition:all 120ms ease}

@@ -63,7 +63,7 @@ export default function Error({
           {[
             { label: 'Browse',        href: '/' },
             { label: 'Compare',       href: '/compare' },
-            { label: 'Help Me Choose',  href: '/pick' },
+            { label: 'Pick a phone',  href: '/pick' },
           ].map(({ label, href }) => (
             <Link
               key={href}

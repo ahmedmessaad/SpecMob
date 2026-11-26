@@ -59,7 +59,7 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-T7WV2C51YF'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Find Your Next Phone`,
+    default: `${SITE_NAME} — Find the Best Phone for Your Budget`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     type: 'website',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Find Your Next Phone`,
+    title: `${SITE_NAME} — Find the Best Phone for Your Budget`,
     description: SOCIAL_DESCRIPTION,
     images: [
       {
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${SITE_NAME} — Find Your Next Phone`,
+    title: `${SITE_NAME} — Find the Best Phone for Your Budget`,
     description: SOCIAL_DESCRIPTION,
     images: ['/og-image.png'],
   },

@@ -83,7 +83,7 @@ function SearchContent({ q, data, failed, loading }: Props) {
               {(data.empty?.categories ?? []).map(cat => <Link key={cat.slug} href={cat.path} style={pill}>{cat.title}</Link>)}
               <Link href={ROUTES.best} style={pill}>All rankings</Link>
               <Link href={ROUTES.brands} style={pill}>Browse brands</Link>
-              <Link href={ROUTES.pick} style={pill}>Help me choose</Link>
+              <Link href={ROUTES.pick} style={pill}>Pick a phone</Link>
             </div>
           </section>
         )}
@@ -92,7 +92,7 @@ function SearchContent({ q, data, failed, loading }: Props) {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <Link href={ROUTES.best} style={pill}><Search size={13} style={{ verticalAlign: -2 }} /> Browse rankings</Link>
             <Link href={ROUTES.brands} style={pill}>Browse brands</Link>
-            <Link href={ROUTES.pick} style={pill}>Help me choose</Link>
+            <Link href={ROUTES.pick} style={pill}>Pick a phone</Link>
           </div>
         )}
       </main>

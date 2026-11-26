@@ -16,10 +16,10 @@ const COPY: Record<string, CategoryCopy> = {
     head: 'Best Camera Phones {y}: Top {n} by Camera Specs',
   },
   'battery-life': {
-    lead: 'Longest battery life phones',
+    lead: 'Best battery life phones',
     topic: 'phone with the longest battery life',
     basis: 'estimated screen-on hours',
-    head: 'Longest Battery Life Phones {y}: Top {n} Ranked',
+    head: 'Best Battery Life Phones {y}: Top {n} Ranked',
     qualifier: 'Hours are estimates from battery capacity and display size, not lab tests.',
   },
   'gaming-phones': {

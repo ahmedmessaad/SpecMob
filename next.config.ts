@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   eslint: { ignoreDuringBuilds: true },
   async redirects() {
     return [
+      { source: '/support', destination: '/fund', permanent: true },
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'specmob.vercel.app' }],

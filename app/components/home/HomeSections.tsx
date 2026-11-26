@@ -138,7 +138,7 @@ export function TradeInBanner() {
     <section aria-labelledby="trade-in" style={{ ...wrap, paddingTop: 64 }}>
       <div className="home-tradein">
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 10 }}>Trade-in estimator</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)', marginBottom: 10 }}>Trade-in value</div>
           <h2 id="trade-in" style={{ fontFamily: f.serif, fontSize: 'clamp(24px,3vw,32px)', fontWeight: 400, color: '#fff', lineHeight: 1.15, margin: '0 0 8px' }}>
             Got an old phone? See what it&apos;s worth.
           </h2>

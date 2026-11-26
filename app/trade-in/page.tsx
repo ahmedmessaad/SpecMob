@@ -17,7 +17,7 @@ export const metadata: Metadata = buildMetadata({
 export default function TradeInPage() {
   return (
     <>
-      <JsonLd data={buildBreadcrumbList([{ name: 'Home', path: ROUTES.home }, { name: 'Trade-in estimator', path: ROUTES.tradein }])} />
+      <JsonLd data={buildBreadcrumbList([{ name: 'Home', path: ROUTES.home }, { name: 'Trade-in value', path: ROUTES.tradein }])} />
       <TradeInClient>
         <TradeInInfo />
       </TradeInClient>
