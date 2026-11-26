@@ -31,9 +31,9 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Specmob',
     links: [
-      { label: 'About Specmob', href: ROUTES.about },
+      { label: 'About', href: ROUTES.about },
       { label: 'How we score', href: ROUTES.methodology },
-      { label: 'Contact Specmob', href: ROUTES.contact },
+      { label: 'Contact', href: ROUTES.contact },
       { label: 'Fund Specmob', href: ROUTES.fund },
     ],
   },
