@@ -2,7 +2,6 @@
 // Static "coming soon" page. No server work, no API calls, no client logic.
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import AdSlot from '@/app/components/ads/AdSlot'
 import JsonLd from '@/app/components/JsonLd'
 import { ROUTES } from '@/lib/config'
 import { buildMetadata } from '@/lib/seo'
@@ -70,7 +69,6 @@ export default function TradeInPage() {
           Back to home
         </Link>
       </div>
-      <AdSlot id="tradein-1" />
     </main>
   )
 }
